@@ -4,10 +4,6 @@ import asyncio
 import requests
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from dotenv import load_dotenv
-
-# ---------- Load .env ----------
-load_dotenv()
 
 # ---------- Config ----------
 BOT_TOKEN = os.getenv("BOT_TOKEN")  # set in Render/ENV
@@ -28,7 +24,6 @@ bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 # In-memory user prefs (replace with DB later if needed)
-# { user_id: {"lang":"EN"|"RU"} }
 USER_PREFS = {}
 
 # ---------- Helpers ----------
@@ -134,7 +129,6 @@ async def cmd_translate(message: types.Message):
             return await message.reply("❌ Please provide text to translate. Example: <code>/translate hello</code>")
         return await message.reply("❌ Введите текст для перевода. Пример: <code>/translate спасибо</code>")
     query = parts[1].strip()
-    # Decide direction based on input script by default
     target = "ru" if is_ascii(query) else "en"
     result = translate_word(query, target)
     arrow = "→"
@@ -153,7 +147,7 @@ async def handle_lang_pick(message: types.Message):
         await message.answer("✅ Язык интерфейса: Русский. Наберите /help для списка команд.",
                              reply_markup=types.ReplyKeyboardRemove())
 
-# ---------- Health / Memory log (debug-friendly) ----------
+# ---------- Health / Memory log ----------
 async def memory_heartbeat():
     try:
         import psutil
