@@ -185,3 +185,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 CMD ["python", "bot.py"]
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+DEFAULT_LANGUAGE = os.getenv("DEFAULT_LANGUAGE", "en")
+TRANSLATE_API_URL = os.getenv("TRANSLATE_API_URL")
+TRANSLATE_API_KEY = os.getenv("TRANSLATE_API_KEY")
+DEBUG = os.getenv("DEBUG", "False") == "True"
