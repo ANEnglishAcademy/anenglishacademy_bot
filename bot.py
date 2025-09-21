@@ -4,10 +4,14 @@ import asyncio
 import requests
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from dotenv import load_dotenv
+
+# ---------- Load .env ----------
+load_dotenv()
 
 # ---------- Config ----------
 BOT_TOKEN = os.getenv("BOT_TOKEN")  # set in Render/ENV
-TRANSLATE_API_URL = os.getenv("LIBRETRANSLATE_URL", "https://libretranslate.de/translate")
+TRANSLATE_API_URL = os.getenv("TRANSLATE_API_URL", "https://libretranslate.de/translate")
 DEFAULT_LANGUAGE = os.getenv("DEFAULT_LANGUAGE", "EN")  # EN or RU
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
@@ -166,32 +170,3 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.create_task(memory_heartbeat())
     executor.start_polling(dp, skip_updates=True)
-# Stable Python for aiogram/aiohttp
-FROM python:3.11-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-WORKDIR /app
-
-# System deps (faster wheels & stable requests)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc curl ca-certificates \
- && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-CMD ["python", "bot.py"]
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-DEFAULT_LANGUAGE = os.getenv("DEFAULT_LANGUAGE", "en")
-TRANSLATE_API_URL = os.getenv("TRANSLATE_API_URL")
-TRANSLATE_API_KEY = os.getenv("TRANSLATE_API_KEY")
-DEBUG = os.getenv("DEBUG", "False") == "True"
