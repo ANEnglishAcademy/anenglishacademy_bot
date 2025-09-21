@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: anenglishacademy-bot
+    env: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: LIBRETRANSLATE_URL
+        value: https://libretranslate.de/translate
+      - key: DEFAULT_LANGUAGE
+        value: EN
+      - key: LOG_LEVEL
+        value: INFO
