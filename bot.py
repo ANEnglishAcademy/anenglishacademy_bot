@@ -164,3 +164,8 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.create_task(memory_heartbeat())
     executor.start_polling(dp, skip_updates=True)
+from aiogram import types
+
+@dp.message_handler(commands=["ping"])
+async def ping_handler(message: types.Message):
+    await message.answer("🏓 Pong! The bot is alive.")
