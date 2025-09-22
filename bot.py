@@ -1,76 +1,72 @@
 import logging
 import os
+import aiohttp
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.utils.exceptions import Throttled
 
 # Logging
 logging.basicConfig(level=logging.INFO)
 
-# Load environment variables
+# Environment variables
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = os.getenv("ADMIN_ID")
+ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
+TRANSLATE_URL = os.getenv("TRANSLATE_URL", "https://libretranslate.de/translate")
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
 
-# --- Health Check ---
-@dp.message_handler(commands=['health'])
+# Health check
+@dp.message_handler(commands=["health"])
 async def health(message: types.Message):
-    await message.answer("✅ Bot is alive and running!")
+    await message.reply("✅ Bot is running and healthy!")
 
-# --- Dictionary Lookup ---
-@dp.message_handler(commands=['translate'])
-async def translate(message: types.Message):
-    try:
-        parts = message.text.split(maxsplit=2)
-        if len(parts) < 2:
-            await message.reply("Usage: /translate <word>")
-            return
-        word = parts[1]
-
-        # Dummy bilingual dictionary (EN <-> RU)
-        dictionary = {
-            "hello": "привет",
-            "dog": "собака",
-            "cat": "кот",
-            "love": "любовь",
-            "peace": "мир",
-            "teacher": "учитель",
-            "student": "студент"
-        }
-
-        if word.lower() in dictionary:
-            result = dictionary[word.lower()]
-            await message.answer(f"🔤 {word} → {result}")
-        elif word.lower() in [v.lower() for v in dictionary.values()]:
-            # Reverse lookup (RU → EN)
-            for eng, ru in dictionary.items():
-                if ru.lower() == word.lower():
-                    await message.answer(f"🔤 {word} → {eng}")
-                    return
-        else:
-            await message.answer("❌ Word not found in dictionary.")
-    except Exception as e:
-        logging.error(f"Error in translate: {e}")
-        await message.reply("⚠️ Something went wrong. Try again.")
-
-# --- Admin Ping ---
-@dp.message_handler(commands=['ping'])
-async def ping(message: types.Message):
-    if str(message.from_user.id) == ADMIN_ID:
-        await message.answer("🏓 Pong! Bot is responsive.")
-    else:
-        await message.answer("⛔ You are not authorized to use this command.")
-
-# --- Start Command ---
-@dp.message_handler(commands=['start'])
+# Start command
+@dp.message_handler(commands=["start"])
 async def start(message: types.Message):
-    await message.answer("👋 Hello! I’m your English Academy Bot.\n\n"
-                         "Available commands:\n"
-                         "• /health → check bot status\n"
-                         "• /translate <word> → lookup EN/RU word\n"
-                         "• /ping → admin only\n")
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add("🇬🇧 English", "🇷🇺 Russian")
+    await message.answer(
+        "👋 Welcome to AN English Academy Bot!\nPlease choose your language:",
+        reply_markup=keyboard,
+    )
 
-# --- Run ---
-if __name__ == '__main__':
+# Language selection
+@dp.message_handler(lambda m: m.text in ["🇬🇧 English", "🇷🇺 Russian"])
+async def set_language(message: types.Message):
+    lang = "en" if "English" in message.text else "ru"
+    await message.answer(
+        f"✅ Language set to {message.text}. Use /translate <word> to translate."
+    )
+
+# Translation command
+@dp.message_handler(commands=["translate"])
+async def translate_word(message: types.Message):
+    args = message.get_args()
+    if not args:
+        await message.reply("❌ Please provide a word to translate. Example:\n/translate hello")
+        return
+
+    source_lang = "en"
+    target_lang = "ru"
+    if message.text.startswith("/translate "):
+        text = args.strip()
+    else:
+        text = message.text.strip()
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            TRANSLATE_URL,
+            json={"q": text, "source": source_lang, "target": target_lang, "format": "text"},
+        ) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                await message.reply(f"🌍 Translation:\n{data.get('translatedText')}")
+            else:
+                await message.reply("⚠️ Translation service error.")
+
+# Echo fallback
+@dp.message_handler()
+async def echo(message: types.Message):
+    await message.reply("🤖 I didn’t understand that. Try /translate <word> or /start.")
+
+if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=True)
