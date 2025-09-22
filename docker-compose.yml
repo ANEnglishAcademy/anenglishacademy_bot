@@ -3,6 +3,6 @@ version: "3.9"
 services:
   bot:
     build: .
-    env_file:
-      - .env
+    container_name: anenglishacademy_bot
     restart: always
+    env_file: .env
