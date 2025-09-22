@@ -6,7 +6,7 @@ from aiogram import Bot, Dispatcher, executor, types
 logging.basicConfig(level=logging.INFO)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")  
-ADMIN_ID = int(os.getenv("3895672"))
+ADMIN_ID = int(os.getenv("1112146597"))
 TRANSLATE_URL = os.getenv("TRANSLATE_URL")
 TRANSLATE_LANG = os.getenv("TRANSLATE_LANG", "ru")
 
