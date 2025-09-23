@@ -2,8 +2,5 @@ services:
   - type: worker
     name: speakeasy-bot
     env: docker
-    plan: starter
+    plan: free
     autoDeploy: true
-    # Render will run the Docker CMD; no startCommand needed for docker env.
-    # Set env vars in the Render dashboard:
-    # BOT_TOKEN, ADMIN_ID, (optional) TRANSLATE_URL, (optional) TRANSLATE_TIMEOUT
