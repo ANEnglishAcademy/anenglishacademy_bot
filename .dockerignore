@@ -1,11 +1,9 @@
-.git
-.gitignore
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.log
+*.db
+*.sqlite3
 .env
-venv/
-.env.*
-.DS_Store
+.git
+.gitignore
