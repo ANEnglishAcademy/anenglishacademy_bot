@@ -1,45 +1,47 @@
-# ANEnglishAcademyBot (Docker, Render-ready)
+# SpeakEasy (@BlaBlaEnglishBot)
 
-Telegram study bot for bilingual (EN↔RU) on-demand translations with LibreTranslate.
-Includes health check, auto-detected direction, and a quick "TR:" shortcut.
+Fun English practice + quick EN⇄RU translation. Bilingual UI (EN/RU), on-demand `/translate`.
 
-## What’s inside
-- Python **3.11** (locked in Docker)
-- aiogram **2.25.1**, aiohttp **3.8.6**
-- Commands: `/start`, `/help`, `/ping`, `/translate`
-- Quick translate: messages starting with `TR:`
-- Minimal, stable worker (long-polling)
+## Commands
+- `/start` — start the bot
+- `/help` — help
+- `/lang` — switch interface EN/RU
+- `/translate` <text> — translate; or reply `/translate` to any message
+- `/settings` — view your settings
+- `/about` — about the bot
+- `/cancel` — cancel current action
+- `/health` — health check (admin only)
 
-## Files
-- `bot.py` — bot logic
-- `requirements.txt` — pinned deps (compatible combo)
-- `Dockerfile` — pins Python 3.11 and installs deps
-- `.dockerignore` — clean Docker context
-- `render.yaml` — Render worker config (env: docker)
-- `.env.example` — local-development template
-- `docker-compose.yml` — local run helper (optional)
+## Deploy (Render, Docker)
 
-## Environment Variables
-Set these on Render (Service → Environment):
-- `BOT_TOKEN` — BotFather token (required)
-- `ADMIN_ID` — your numeric Telegram ID (optional, reserved)
-- `TRANSLATE_URL` — e.g. `https://libretranslate.de/translate`
-- `TRANSLATE_API_KEY` — (only if your LT instance needs a key)
+1. Create a **Background Worker** (env: `docker`) from this repo.
+2. In **Environment Variables**, set:
+   - `BOT_TOKEN` — the token from BotFather
+   - `ADMIN_ID` — your numeric Telegram user id (e.g., `1112146597`)
+   - (optional) `TRANSLATE_URL` — default `https://libretranslate.com/translate`
+   - (optional) `TRANSLATE_TIMEOUT` — default `8`
+3. Deploy. Logs should show:
+   - `Bot: SpeakEasy [@BlaBlaEnglishBot]`
+   - `Start polling.`
+   - `Updates were skipped successfully.` (expected once at start)
 
-## Deploy on Render (Background Worker)
-1. Push this repo to GitHub.
-2. On Render: **New → Background Worker → From Repo**.
-   - Render will detect the `Dockerfile`.
-3. Add Environment Variables (see above).
-4. Deploy. Watch logs.
+### Avoiding the “TerminatedByOtherGetUpdates” conflict
+- Ensure **only one** instance of the bot is running:
+  - Only one Render worker (Scaling = 1).
+  - You’re **not** running the bot locally.
+  - Webhooks are **not** set (we use long-polling). To confirm:
+    - Visit: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getWebhookInfo`
+      - Must return `{"ok":true,"result":{"url":"" ...}}`
+    - If any `url` is set, clear it:
+      - `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/deleteWebhook?drop_pending_updates=true`
+- If you changed tokens or migrated services, redeploy once more to clear stale sessions.
 
-### Expected success logs
-- pip finishes with `Successfully installed ...`
-- Service starts without Python/aiohttp build errors
-- Telegram polling begins (no crash)
-- Sending `/ping` in Telegram replies with `✅ Bot is running`
+## Config notes
+- Python 3.11 (Dockerfile).
+- `aiogram==2.25.1` + `aiohttp==3.8.6` (compatible).
+- Polling worker (no public port, no webhooks).
+- `/health` is admin-only (uses `ADMIN_ID`).
 
-## Local run (optional)
-Create `.env` from `.env.example` and fill values.
-```bash
-docker-compose up --build
+## Privacy
+We do not store your messages or translations. Text is sent to the configured translation service (default: LibreTranslate) only to return a translation. See `PRIVACY.md`.
+
