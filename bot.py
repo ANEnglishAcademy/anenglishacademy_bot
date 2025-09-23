@@ -11,19 +11,6 @@ import aiohttp
 
 logging.basicConfig(level=logging.INFO)
 
-# ========= ENV (set these in Render) =========
-BOT_TOKEN = os.getenv("BOT_TOKEN")  # <-- REQUIRED
-ADMIN_ID = int(os.getenv("ADMIN_ID", "0") or "0")  # <-- REQUIRED (numeric Telegram user id)
-TRANSLATE_URL = os.getenv("TRANSLATE_URL", "https://libretranslate.com/translate")  # optional override
-TRANSLATE_TIMEOUT = float(os.getenv("TRANSLATE_TIMEOUT", "8"))  # optional
-
-if not BOT_TOKEN:
-    raise RuntimeError("BOT_TOKEN is not set")
-
-bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
-dp = Dispatcher(bot)
-dp.middleware.setup(LoggingMiddleware())
-
 # ========= Simple in-memory user prefs (per-process) =========
 user_lang = {}  # user_id -> "en" | "ru"
 
