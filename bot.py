@@ -58,4 +58,5 @@ async def health_command(message: types.Message):
     await message.answer("✅ Bot is running fine!")
 
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+from aiogram import executor
+executor.start_polling(dp, skip_updates=True)
