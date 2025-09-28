@@ -1,0 +1,89 @@
+# ========================
+# Python cache & packaging
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+pip-wheel-metadata/
+
+# ========================
+# Virtual environments
+# ========================
+venv/
+.env/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ========================
+# Environment variables
+# ========================
+.env
+
+# ========================
+# Logs & debugging
+# ========================
+*.log
+*.out
+*.err
+
+# ========================
+# IDE & editor configs
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ========================
+# OS-specific junk
+# ========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ========================
+# Jupyter & notebooks
+# ========================
+.ipynb_checkpoints/
+*.ipynb
+
+# ========================
+# Coverage & testing
+# ========================
+.coverage
+*.cover
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+.cache/
+
+# ========================
+# Local dev tools
+# ========================
+*.sqlite3
+*.db
+*.sql
+*.bak
+
+# ========================
+# Custom: Project-specific
+# ========================
+# Do not commit media or large test files accidentally
+/media/
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.wav
+*.mp3
