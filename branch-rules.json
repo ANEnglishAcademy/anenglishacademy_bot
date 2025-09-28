@@ -1,0 +1,44 @@
+{
+  "branches": {
+    "main": {
+      "purpose": "Stable production code (locked English MVP).",
+      "rules": [
+        "Never commit directly to main.",
+        "Protect main branch in GitHub settings.",
+        "Only update main through Pull Requests after review.",
+        "Always keep main in a working, deployable state."
+      ]
+    },
+    "test": {
+      "purpose": "Sandbox branch for experiments and new features.",
+      "rules": [
+        "Do all development here before merging to main.",
+        "Commit and push freely.",
+        "If broken, reset to main with 'git reset --hard main' and push --force.",
+        "Use Pull Requests to merge tested changes into main."
+      ]
+    },
+    "feature/*": {
+      "purpose": "Optional dedicated branches for big features.",
+      "examples": [
+        "feature/bilingual",
+        "feature/taskpacks",
+        "feature/ai-feedback"
+      ],
+      "rules": [
+        "Branch off from test (not from main).",
+        "Work on a single feature per branch.",
+        "Merge into test after feature is stable.",
+        "Delete feature branch after merging to keep repo clean."
+      ]
+    }
+  },
+  "workflow": {
+    "step1": "Lock main branch (protect in GitHub).",
+    "step2": "Do all coding in test or feature/* branches.",
+    "step3": "Push changes to GitHub.",
+    "step4": "Open Pull Request (test → main) when stable.",
+    "step5": "Merge only after review.",
+    "step6": "If test breaks, reset it to main."
+  }
+}
