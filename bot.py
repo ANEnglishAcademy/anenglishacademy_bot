@@ -1,41 +1,56 @@
 import os
+import asyncio
 import logging
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from dotenv import load_dotenv
 
-# Logging setup
-logging.basicConfig(level=logging.INFO)
-
-# Environment variables
+# Load .env file for BOT_TOKEN
+load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
 if not BOT_TOKEN:
-    raise ValueError("❌ BOT_TOKEN not found. Please set it in Render Environment.")
+    raise ValueError("❌ BOT_TOKEN not found in environment!")
 
+# Logging
+logging.basicConfig(level=logging.INFO)
+
+# Create bot and dispatcher
 bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
-# Startup
-async def on_startup(dp):
-    logging.info("🤖 SpeakEasy Bot started as @BlaBlaEnglishBot")
+# -------------------- COMMAND HANDLERS --------------------
 
-# Commands
-@dp.message_handler(commands=["start"])
+@dp.message(Command("start"))
 async def start_cmd(message: types.Message):
-    await message.answer("👋 Welcome to SpeakEasy (@BlaBlaEnglishBot)!")
+    await message.answer("👋 Welcome to AN English Academy!\nType /help to see what I can do.")
 
-@dp.message_handler(commands=["help"])
+@dp.message(Command("help"))
 async def help_cmd(message: types.Message):
-    await message.answer("ℹ️ Available commands:\n/start – Launch\n/help – Help\n/policy – Privacy Policy")
+    await message.answer(
+        "📚 Available commands:\n"
+        "/start – Greet the user\n"
+        "/help – Show this menu\n"
+        "/setlevel – Choose your English level"
+    )
 
-@dp.message_handler(commands=["policy"])
-async def policy_cmd(message: types.Message):
-    await message.answer("🔒 Privacy Policy: We do not store personal data. Conversations are for learning only.")
+@dp.message(Command("setlevel"))
+async def set_level(message: types.Message):
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=[
+            [types.KeyboardButton(text="A1"), types.KeyboardButton(text="A2")],
+            [types.KeyboardButton(text="B1"), types.KeyboardButton(text="B2")],
+            [types.KeyboardButton(text="C1")]
+        ],
+        resize_keyboard=True
+    )
+    await message.answer("📊 Choose your English level:", reply_markup=keyboard)
 
-# Echo fallback
-@dp.message_handler()
-async def echo(message: types.Message):
-    await message.answer(message.text)
+# -------------------- START BOT --------------------
+
+async def main():
+    logging.info("🤖 Bot is running...")
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+    asyncio.run(main())
